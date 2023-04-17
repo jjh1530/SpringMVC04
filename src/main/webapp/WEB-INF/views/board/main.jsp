@@ -1,20 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>  
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>   
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> 
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %> 
+<c:set var="mvo" value="${SPRING_SECURITY_CONTEXT.authentication.principal}"/> 
+<c:set var="auth" value="${SPRING_SECURITY_CONTEXT.authentication.authorities}"/>   
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Spring MVC02</title>
+  <title>Spring MVC06</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script type="text/javascript">
-	  var csrfHeaderName = "${_csrf.headerName}";
-	  var csrfTokenValue = "${_csrf.token}";
-	  
+    var csrfHeaderName = "${_csrf.headerName}";
+    var csrfTokenValue = "${_csrf.token}";
      $(document).ready(function(){
     	loadList();    	 
      });  
@@ -50,27 +52,26 @@
         	 listHtml+="<td>내용</td>";
         	 listHtml+="<td colspan='4'>";
         	 listHtml+="<textarea id='ta"+obj.idx+"' readonly rows='7' class='form-control'></textarea>";
-        	 if("${mvo.memID}" == obj.memID){
-        	 listHtml+="<br/>";
-        	 listHtml+="<span id='ub"+obj.idx+"'><button class='btn btn-success btn-sm' onclick='goUpdateForm("+obj.idx+")'>수정화면</button></span>&nbsp;";
-        	 listHtml+="<button class='btn btn-warning btn-sm' onclick='goDelete("+obj.idx+")'>삭제</button>";        	 
-        	 }else {
-        		 listHtml+="<br/>";
-            	 listHtml+="<span id='ub"+obj.idx+"'><button disabled class='btn btn-success btn-sm' onclick='goUpdateForm("+obj.idx+")'>수정화면</button></span>&nbsp;";
-            	 listHtml+="<button disabled class='btn btn-warning btn-sm' onclick='goDelete("+obj.idx+")'>삭제</button>";        	 
-            	 	 
+        	 if("${mvo.member.memID}"==obj.memID){
+        	  listHtml+="<br/>";
+        	  listHtml+="<span id='ub"+obj.idx+"'><button class='btn btn-success btn-sm' onclick='goUpdateForm("+obj.idx+")'>수정화면</button></span>&nbsp;";
+        	  listHtml+="<button class='btn btn-warning btn-sm' onclick='goDelete("+obj.idx+")'>삭제</button>";        	 
+        	 }else{
+        	  listHtml+="<br/>";
+           	  listHtml+="<span id='ub"+obj.idx+"'><button disabled class='btn btn-success btn-sm' onclick='goUpdateForm("+obj.idx+")'>수정화면</button></span>&nbsp;";
+           	  listHtml+="<button disabled class='btn btn-warning btn-sm' onclick='goDelete("+obj.idx+")'>삭제</button>";	 
         	 }
         	 listHtml+="</td>";
         	 listHtml+="</tr>";
         	 
-    	 } );    	 
-    	 //로그인을 해야 보이는 부분
-    	 if (${!empty mvo}) {
-    	 listHtml+="<tr>";
-    	 listHtml+="<td colspan='5'>";
-    	 listHtml+="<button class='btn btn-primary btn-sm' onclick='goForm()'>글쓰기</button>";
-    	 listHtml+="</td>";
-    	 listHtml+="</tr>";
+    	 } );    
+    	 // 로그인을 해야 보이는 부분
+    	 if(${!empty mvo.member}){
+    	  listHtml+="<tr>";
+    	  listHtml+="<td colspan='5'>";
+    	  listHtml+="<button class='btn btn-primary btn-sm' onclick='goForm()'>글쓰기</button>";
+    	  listHtml+="</td>";
+    	  listHtml+="</tr>";
     	 }
     	 listHtml+="</table>";
     	 $("#view").html(listHtml);
@@ -126,11 +127,11 @@
     		 $("#c"+idx).css("display","none"); // 감추게
     		 $.ajax({
     			 url : "board/count/"+idx,
-    			 type : "put",
-    			 beforeSend: function(xhr){
-    				 xhr.setRequestHeader(csrfHeaderName, csrfTokenValue)
-    			 },
+    			 type : "put",    			 
     			 dataType : "json",
+    			 beforeSend: function(xhr){
+        			 xhr.setRequestHeader(csrfHeaderName, csrfTokenValue)
+        		 },
     			 success : function(data){
     				 $("#cnt"+idx).text(data.count);
     			 },    			 
@@ -141,10 +142,10 @@
      function goDelete(idx){
     	 $.ajax({
     		 url : "board/"+idx,
-    		 type : "delete",
+    		 type : "delete",  
     		 beforeSend: function(xhr){
     			 xhr.setRequestHeader(csrfHeaderName, csrfTokenValue)
-    		},
+    		 },
     		 success : loadList,
     		 error : function(){ alert("error"); }    		 
     	 });
@@ -164,12 +165,12 @@
     	 var content=$("#ta"+idx).val();
     	 $.ajax({
     		 url : "board/update",
-    		 type : "put",
-    		 beforeSend: function(xhr){
-    			 xhr.setRequestHeader(csrfHeaderName, csrfTokenValue)
-    			 },
+    		 type : "put",    		 
     		 contentType:'application/json;charset=utf-8',
     		 data : JSON.stringify({"idx":idx,"title":title,"content":content}),
+    		 beforeSend: function(xhr){
+    			 xhr.setRequestHeader(csrfHeaderName, csrfTokenValue)
+    		 },
     		 success : loadList,
     		 error : function(){ alert("error"); }    		 
     	 });
@@ -177,16 +178,15 @@
   </script>
 </head>
 <body>
- 
 <div class="container">
-<jsp:include page="../common/header.jsp"/>
-  <h2>회원게시판</h2>
+  <jsp:include page="../common/header.jsp"/> 
+  <h3>회원게시판</h3>
   <div class="panel panel-default">
     <div class="panel-heading">BOARD</div>
     <div class="panel-body" id="view">Panel Content</div>
     <div class="panel-body" id="wfrom" style="display: none">
      <form id="frm">
-      <input type="hidden" name="memID" value="${mvo.memID }"/>
+      <input type="hidden" name="memID" id="memID" value="${mvo.member.memID}"/>
       <table class="table">
          <tr>
            <td>제목</td>
@@ -198,7 +198,7 @@
          </tr>
          <tr>
            <td>작성자</td>
-           <td><input type="text" id="writer" name="writer" class="form-control" value="${mvo.memName }" readonly="readonly"/></td>
+           <td><input type="text" id="writer" name="writer" class="form-control" value="${mvo.member.memName}" readonly="readonly"/></td>
          </tr>
          <tr>
            <td colspan="2" align="center">

@@ -1,5 +1,7 @@
 package kr.board.entity;
 
+import java.util.List;
+
 public class Member {
 
 	private int memIdx;
@@ -10,6 +12,8 @@ public class Member {
 	private String memGender;
 	private String memEmail;
 	private String memProfile;
+	private List<AuthVO> authList;
+	
 	public int getMemIdx() {
 		return memIdx;
 	}
@@ -57,6 +61,12 @@ public class Member {
 	}
 	public void setMemProfile(String memProfile) {
 		this.memProfile = memProfile;
+	}
+	public List<AuthVO> getAuthList() {
+		return authList;
+	}
+	public void setAuthList(List<AuthVO> authList) {
+		this.authList = authList;
 	}
 
 	

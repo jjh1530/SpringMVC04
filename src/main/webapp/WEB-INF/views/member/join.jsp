@@ -117,6 +117,15 @@ function goInsert() {
       	    <td style="width:110px; vertical-align: middle;">이메일</td>
       	    <td colspan="2"><input id="memEmail" name="memEmail" class="form-control" type="text" placeholder="이메일" maxlength="20"/></td>
       	  </tr>
+      	  <!-- 권한 체크 박스 -->
+      	  <tr>
+      	    <td style="width:110px; vertical-align: middle;">사용자 권한</td>
+      	    <td clospan="2">
+      	      <input type="checkbox" name="authList[0].auth" value="ROLE_USER"> ROLE_USER
+			  <input type="checkbox" name="authList[1].auth" value="ROLE_MANAGER"> ROLE_MANAGER
+			  <input type="checkbox" name="authList[2].auth" value="ROLE_ADMIN"> ROLE_ADMIN 
+      	    </td>
+      	  </tr>
       	  <tr>
       	    <td colspan="3" style="text-align: left;">
       	    	<span id="passMessage" style="color:red;"></span><input type="submit" value="등록" onclick ="goInsert();"class="btn btn-primary btn-sm pull-right"/>
